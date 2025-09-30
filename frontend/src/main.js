@@ -1,5 +1,13 @@
 import { createApp } from 'vue'
-import './style.css'
+import {createPinia} from 'pinia'
+import router from './router'
+import './assets/style.css'
 import App from './App.vue'
 
-createApp(App).mount('#app')
+if (import.meta.env.DEV) {
+  const { worker } = await import('@/mocks/browser');
+  await worker.start({
+    serviceWorker: { url: '/mockServiceWorker.js' }
+  });
+}
+createApp(App).use(createPinia()).use(router).mount('#app');
