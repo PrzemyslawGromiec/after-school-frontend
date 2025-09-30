@@ -1,0 +1,44 @@
+import { http, HttpResponse, delay } from 'msw';
+
+let lessons = [
+  {_id:'1', subject:'Math',    location:'Hendon',    price:100, spaces:5, image:'math.png'},
+  {_id:'2', subject:'Music',   location:'Colindale', price: 80, spaces:5, image:'music.png'},
+  {_id:'3', subject:'English', location:'Hendon',    price: 90, spaces:5, image:'eng.png'},
+  {_id:'4', subject:'Art',     location:'Brent',     price: 70, spaces:5, image:'art.png'},
+  {_id:'5', subject:'Drama',   location:'Brent',     price: 85, spaces:5, image:'drama.png'},
+  {_id:'6', subject:'Physics', location:'Hendon',    price:110, spaces:5, image:'phys.png'},
+  {_id:'7', subject:'Chem',    location:'Colindale', price:105, spaces:5, image:'chem.png'},
+  {_id:'8', subject:'Bio',     location:'Hendon',    price: 95, spaces:5, image:'bio.png'},
+  {_id:'9', subject:'CS',      location:'Online',    price:120, spaces:5, image:'cs.png'},
+  {_id:'10',subject:'Geo',     location:'Online',    price: 75, spaces:5, image:'geo.png'},
+];
+
+export const handlers = [
+  // GET /api/lessons?q=...
+  http.get('/api/lessons', async ({ request }) => {
+    const url = new URL(request.url);
+    const q = (url.searchParams.get('q') || '').toLowerCase();
+    const data = q ? lessons.filter(l =>
+      l.subject.toLowerCase().includes(q) || l.location.toLowerCase().includes(q)
+    ) : lessons;
+    await delay(200);
+    return HttpResponse.json(data);
+  }),
+
+  http.put('/api/lessons/:id', async ({ params, request }) => {
+    const patch = await request.json();
+    const i = lessons.findIndex(l => l._id === params.id);
+    if (i === -1) return HttpResponse.json({ message:'not found' }, { status:404 });
+    lessons[i] = { ...lessons[i], ...patch };
+    return HttpResponse.json(lessons[i]);
+  }),
+
+  http.post('/api/orders', async ({ request }) => {
+    const { items } = await request.json(); // [{id, qty, price, title}]
+    for (const it of items) {
+      const i = lessons.findIndex(l => l._id === (it.id || it.lessonId));
+      if (i !== -1) lessons[i].spaces = Math.max(0, lessons[i].spaces - (it.qty || 1));
+    }
+    return HttpResponse.json({ orderId: crypto.randomUUID() }, { status:201 });
+  }),
+];
