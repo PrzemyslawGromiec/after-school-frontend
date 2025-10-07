@@ -1,19 +1,12 @@
 import {createRouter, createWebHistory} from 'vue-router'
 import Lessons from '../views/Lessons.vue'
 import Cart from '../views/Cart.vue'
-
-// export default createRouter({
-//     history: createWebHistory(),
-//     routes: [
-//         {path : '/', component: Lessons},
-//         {path : '/cart', component: Cart}
-//     ],
-//     scrollBehavior: () => ({ top: 0 })
-// });
+import Feedback from '../views/Feedback.vue';
 
 const routes = [
     {path : '/', component: Lessons},
-    {path : '/cart', component: Cart}
+    {path : '/cart', component: Cart},
+    {path : '/feedback', name: 'Feedback', component: Feedback}
 ];
 
 const router = createRouter({

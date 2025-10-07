@@ -2,9 +2,11 @@
   <nav class="nav">
     <router-link to="/">Lessons</router-link>
     <router-link to="/cart">Cart ({{ cart.count }})</router-link>
+    <router-link to="/feedback">Feedback</router-link>
   </nav>
 </template>
 <script>
+
 import { useCart } from '../stores/cart.js';
 export default { computed:{ cart: () => useCart() } };
 </script>
