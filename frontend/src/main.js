@@ -10,4 +10,7 @@ if (import.meta.env.DEV) {
     serviceWorker: { url: '/mockServiceWorker.js' }
   });
 }
-createApp(App).use(createPinia()).use(router).mount('#app');
+createApp(App)
+.use(createPinia())
+.use(router)
+.mount('#app');
