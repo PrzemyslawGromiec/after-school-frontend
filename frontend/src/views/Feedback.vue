@@ -1,32 +1,35 @@
 <template>
-    <secttion class="feedback-page">
+    <section class="feedback-page">
         <h1>Feedback</h1>
         <form @submit.prevent="submitFeedback">
             <div>
                 <label for="name">Name:</label>
-                <input type="text" id="name" v-model="name" required />
+                <input type="text" id="name" v-model.trim="name" required />
             </div>
             <div>
                 <label for="email">Email:</label>
-                <input type="email" id="email" v-model="email" required />
+                <input type="email" id="email" v-model.trim="email" required />
             </div>
             <textarea v-model="message" placeholder="Share your thoughts" rows="5"></textarea>
             <button type="submit">Submit</button>
         </form>
 
-        <div v-if="feedbacks.length">
+        <div v-if="feedbacks.length" class="feedback-list">
             <h2>Previous Feedback</h2>
             <ul>
-                <li v-for="(fb, index) in feedbacks" :key="index">
-                    <strong>{{ fb.name }} ({{ fb.email }}):</strong>
+                <li v-for="fb in feedbacks" :key="fb.id">
+                    <strong>{{ fb.name }} ({{ fb.email }})</strong>
+                    <small> — {{ new Date(fb.createdAt).toLocaleString() }}</small>
                     <p>{{ fb.message }}</p>
                 </li>
             </ul>
         </div>
-    </secttion>
+    </section>
 </template>
 
 <script>
+import { sendFeedback, getFeedback } from '../api/feedback';
+
 export default {
     name: 'Feedback',
     data() {
@@ -37,20 +40,18 @@ export default {
             feedbacks: []
         };
     },
+    async mounted() {
+        this.feedbacks = await getFeedback();
+    },
     methods: {
-        submitFeedback() {
-            if (this.name && this.email && this.message) {
-                this.feedbacks.push({
-                    name: this.name,
-                    email: this.email,
-                    message: this.message
-                });
-                this.name = '';
-                this.email = '';
-                this.message = '';
-            } else {
-                alert('Please fill in all fields.');
-            }
+        async submitFeedback() {
+            if (!this.name || !this.email || !this.message) return
+            await sendFeedback({ name: this.name, email: this.email, message: this.message })
+            this.feedbacks = await getFeedback()
+            this.message = '',
+            this.name = '',
+            this.email = ''
+
         }
     }
 };

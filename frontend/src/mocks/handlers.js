@@ -1,4 +1,5 @@
 import { http, HttpResponse, delay } from 'msw';
+import Feedback from '../views/Feedback.vue';
 
 let lessons = [
   {_id:'1', subject:'Math',    location:'Hendon',    price:100, spaces:5, image:'math.png'},
@@ -12,6 +13,8 @@ let lessons = [
   {_id:'9', subject:'CS',      location:'Online',    price:120, spaces:5, image:'cs.png'},
   {_id:'10',subject:'Geo',     location:'Online',    price: 75, spaces:5, image:'geo.png'},
 ];
+
+let feedbacks = [];
 
 export const handlers = [
   // GET /api/lessons?q=...
@@ -41,4 +44,21 @@ export const handlers = [
     }
     return HttpResponse.json({ orderId: crypto.randomUUID() }, { status:201 });
   }),
-];
+
+  //POST /api/feedback
+ http.post('/api/feedback', async ({ request }) => {
+    const { name, email, message } = await request.json()
+    if (!name || !email || !message) {
+      return HttpResponse.json({ error: 'name, email, message required' }, { status: 400 })
+    }
+    const fb = { id: crypto.randomUUID(), name, email, message, createdAt: new Date().toISOString() }
+    feedbacks.unshift(fb)
+    return HttpResponse.json(fb, { status: 201 })
+  }),
+
+  //GET /api/feedback
+  http.get('/api/feedback', async () => {
+    return HttpResponse.json(feedbacks);
+  })
+    
+ ];
