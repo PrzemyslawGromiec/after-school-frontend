@@ -49,8 +49,8 @@ export default {
             await sendFeedback({ name: this.name, email: this.email, message: this.message })
             this.feedbacks = await getFeedback()
             this.message = '',
-            this.name = '',
-            this.email = ''
+                this.name = '',
+                this.email = ''
 
         }
     }
@@ -64,10 +64,52 @@ export default {
     padding: 1rem;
 }
 
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #1e3a8a;
+  letter-spacing: -0.5px;
+  position: relative;
+}
+
+h1::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: #2563eb;
+  margin: 0.5rem auto 0;
+  border-radius: 2px;
+}
+
+
+input,
 textarea {
     width: 100%;
-    padding: .5rem;
+    padding: .5rem .75rem;
+    border: 1px solid #d1d5db;
     margin-bottom: 1rem;
+    font-size: 1rem;
+    background-color: #f9fafb;
+    color: #111827;
+    transition: border-color 0.2s, box-shadow 0.2s
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+    background-color: #fff;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+    color: #374151;
 }
 
 button {
@@ -77,6 +119,7 @@ button {
     border: none;
     border-radius: .25rem;
     cursor: pointer;
+    transition: background 0.5s;
 }
 
 button:hover {
