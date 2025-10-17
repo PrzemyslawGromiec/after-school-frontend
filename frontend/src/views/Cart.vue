@@ -25,14 +25,25 @@
       </ul>
 
       <aside class="summary">
-        <div class="line">
-          <span>Items</span><strong>{{ count }}</strong>
-        </div>
-        <div class="line total">
-          <span>Total</span><strong>£{{ total.toFixed(2) }}</strong>
-        </div>
-        <button class="primary wfull" type="button" @click="checkout">Checkout</button>
-        <button class="secondary wfull" type="button" @click="clear">Clear cart</button>
+        <div class="line"><span>Items</span><strong>{{ count }}</strong></div>
+        <div class="line total"><span>Total</span><strong>£{{ total.toFixed(2) }}</strong></div>
+
+        <!-- Customer form -->
+        <form class="customer" @submit.prevent="checkout">
+          <label>
+            Name
+            <input v-model.trim="customer.name" placeholder="Your name" required />
+          </label>
+          <label>
+            Phone
+            <input v-model.trim="customer.phone" placeholder="+44 7700 900123" inputmode="tel" required />
+          </label>
+
+          <p v-if="!isValid && touched" class="error">Enter a valid name and phone.</p>
+
+          <button class="primary wfull" type="submit" :disabled="!isValid">Checkout</button>
+          <button class="secondary wfull" type="button" @click="clear">Clear cart</button>
+        </form>
       </aside>
     </section>
   </main>
@@ -44,11 +55,21 @@ import { api } from '@/api/http';
 
 export default {
   name: 'Cart',
+  data: () => ({
+    customer: { name: '', phone: '' },
+    touched: false
+  }),
   computed: {
     cart() { return useCart(); },
     items() { return this.cart.items || []; },
     count() { return this.cart.count ?? this.items.reduce((a, i) => a + i.qty, 0); },
     total() { return this.cart.total ?? this.items.reduce((a, i) => a + i.qty * i.price, 0); },
+    isValid() {
+      const nameOk = this.customer.name.length >= 2;
+      // simple phone check: digits/space/+/- between 7–15 chars
+      const phoneOk = /^\+?[0-9\s-]{7,15}$/.test(this.customer.phone);
+      return nameOk && phoneOk && this.items.length > 0;
+    }
   },
   methods: {
     inc(it) {
@@ -76,13 +97,20 @@ export default {
       else this.cart.items = [];
     },
     async checkout() {
+      this.touched = true;
+      if (!this.isValid) return;
+
       const payload = {
+        customer: { name: this.customer.name, phone: this.customer.phone },
         items: this.items.map(i => ({ id: i.id, qty: i.qty, price: i.price, title: i.title }))
       };
+
       try {
         const res = await api('/orders', { method: 'POST', body: JSON.stringify(payload) });
         alert(`Order placed! ID: ${res.orderId || 'OK'}`);
         this.clear();
+        this.customer.name = '';
+        this.customer.phone = '';
         this.$router.push('/');
       } catch (e) {
         alert('Checkout failed: ' + (e.message || e));
@@ -208,6 +236,11 @@ h1::after {
   color: #111827;
 }
 
+.qty input[type="number"] { -moz-appearance: textfield; }
+
+/* Disabled checkout look */
+.primary:disabled { background:#9ca3af; cursor:not-allowed; opacity:.9; }
+
 .pill {
   display: flex;
   align-items: center;
@@ -238,10 +271,6 @@ input[type="number"]::-webkit-outer-spin-button {
   margin: 0;
 }
 
-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
 .remove {
   border: none;
   background: transparent;
@@ -269,6 +298,38 @@ input[type="number"] {
 .line {
   display: flex;
   justify-content: space-between;
+}
+
+.customer label {
+  display: grid;
+  gap: .25rem;
+  margin-bottom: .5rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.customer button {
+  margin-top: .75rem;
+}
+
+.customer input {
+  width: 100%;
+  padding: .5rem .75rem;
+  border: 1px solid #d1d5db;
+  border-radius: .5rem;
+  background: #fff;
+  color: #111827;
+}
+
+.customer input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+}
+
+.error {
+  color: #b91c1c;
+  font-size: .9rem;
 }
 
 .total span {

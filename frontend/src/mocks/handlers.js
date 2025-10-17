@@ -37,13 +37,42 @@ export const handlers = [
   }),
 
   http.post('/api/orders', async ({ request }) => {
-    const { items } = await request.json(); // [{id, qty, price, title}]
-    for (const it of items) {
-      const i = lessons.findIndex(l => l._id === (it.id || it.lessonId));
-      if (i !== -1) lessons[i].spaces = Math.max(0, lessons[i].spaces - (it.qty || 1));
+  const body = await request.json();
+  const items = Array.isArray(body.items) ? body.items : [];
+  const customer = body.customer || {};
+  const { name = '', phone = '' } = customer;
+
+  // simple validation
+  if (!items.length) {
+    return HttpResponse.json({ error: 'Cart is empty' }, { status: 400 });
+  }
+  const nameOk = name.trim().length >= 2;
+  const phoneOk = /^\+?[0-9\s-]{7,15}$/.test(phone);
+  if (!nameOk || !phoneOk) {
+    return HttpResponse.json({ error: 'Invalid name or phone' }, { status: 400 });
+  }
+
+  // update lesson spaces
+  for (const it of items) {
+    const i = lessons.findIndex(l => l._id === (it.id || it.lessonId));
+    if (i !== -1) {
+      const qty = Math.max(1, Number(it.qty || 1));
+      lessons[i].spaces = Math.max(0, lessons[i].spaces - qty);
     }
-    return HttpResponse.json({ orderId: crypto.randomUUID() }, { status:201 });
-  }),
+  }
+
+  // build order payload
+  const order = {
+    orderId: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    customer: { name: name.trim(), phone: phone.trim() },
+    items: items.map(i => ({ id: i.id || i.lessonId, qty: Number(i.qty || 1), price: Number(i.price || 0), title: i.title })),
+    total: items.reduce((sum, i) => sum + Number(i.price || 0) * Number(i.qty || 1), 0)
+  };
+
+  return HttpResponse.json(order, { status: 201 });
+}),
+
 
   //POST /api/feedback
  http.post('/api/feedback', async ({ request }) => {

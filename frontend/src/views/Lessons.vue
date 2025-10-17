@@ -21,7 +21,7 @@
 
       <button class="icon-btn" type="button" @click="toggleDir"
         :aria-label="`Sort ${dir === 'ASC' ? 'descending' : 'ascending'}`">
-        {{ dir === 'ASC' ? '⬇️' : '⬆️' }}
+        {{ dir === 'ASC' ? '⬆️' : '⬇️' }}
       </button>
 
       <router-link class="cart-link" to="/cart" aria-label="Open cart">
