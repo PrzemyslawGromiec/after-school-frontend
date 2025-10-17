@@ -123,7 +123,7 @@ export default {
 <style scoped>
 .page {
   padding: 1rem;
-  max-width: 1100px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -207,8 +207,8 @@ select {
 }
 
 select:focus {
-  background: #fff;                 /* brighten on focus */
-  border-color: #2563eb;            /* blue focus border */
+  background: #fff; 
+  border-color: #2563eb;
   outline: none;
 }
 
@@ -216,10 +216,9 @@ select:hover {
   background: #f3f4f6;
 }
 
-/* grid of lesson cards */
 .grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
 }
 </style>
