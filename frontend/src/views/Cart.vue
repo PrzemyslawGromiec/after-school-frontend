@@ -28,7 +28,6 @@
         <div class="line"><span>Items</span><strong>{{ count }}</strong></div>
         <div class="line total"><span>Total</span><strong>£{{ total.toFixed(2) }}</strong></div>
 
-        <!-- Customer form -->
         <form class="customer" @submit.prevent="checkout">
           <label>
             Name
@@ -236,10 +235,16 @@ h1::after {
   color: #111827;
 }
 
-.qty input[type="number"] { -moz-appearance: textfield; }
+.qty input[type="number"] {
+  -moz-appearance: textfield;
+}
 
 /* Disabled checkout look */
-.primary:disabled { background:#9ca3af; cursor:not-allowed; opacity:.9; }
+.primary:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  opacity: .9;
+}
 
 .pill {
   display: flex;

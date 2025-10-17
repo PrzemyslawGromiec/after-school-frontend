@@ -24,9 +24,6 @@
         {{ dir === 'ASC' ? '⬆️' : '⬇️' }}
       </button>
 
-      <router-link class="cart-link" to="/cart" aria-label="Open cart">
-        Cart <span class="badge">{{ cartCount }}</span>
-      </router-link>
     </header>
 
     <section class="grid">
@@ -131,6 +128,7 @@ export default {
   height: 36px;
   object-fit: contain;
 }
+
 .visually-hidden {
   position: absolute !important;
   width: 1px;
@@ -203,21 +201,6 @@ export default {
   transform: translateY(1px);
 }
 
-.cart-link {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  background: #2563eb;
-  color: #fff;
-  padding: .5rem .75rem;
-  border-radius: .5rem;
-  text-decoration: none;
-}
-
-.cart-link:hover {
-  background: #1e40af;
-}
-
 .badge {
   display: inline-block;
   min-width: 1.5rem;
@@ -234,9 +217,6 @@ export default {
     grid-template-columns: 1fr auto auto;
   }
 
-  .cart-link {
-    justify-self: end;
-  }
 }
 
 select {
