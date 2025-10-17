@@ -5,11 +5,12 @@
     <router-link to="/feedback">Feedback</router-link>
   </nav>
 </template>
-<script>
 
+<script>
 import { useCart } from '../stores/cart.js';
 export default { computed:{ cart: () => useCart() } };
 </script>
+
 <style scoped>
 
 .nav { 

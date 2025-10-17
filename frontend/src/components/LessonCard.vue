@@ -5,7 +5,11 @@
     <p>Location: {{ lesson.location }} </p>
     <p>Price: £{{ lesson.price }} </p>
     <p :class="lesson.spaces > 0 ? 'ok' : 'out'">{{ lesson.spaces > 0 ? `${lesson.spaces} left` : 'Sold out' }}</p>
-    <button :disabled="lesson.spaces === 0" @click="$emit('add', lesson)">Add to cart</button>
+    <button 
+      :disabled="lesson.spaces === 0" 
+      @click="handleClick"
+      >Add to cart
+    </button>
   </article>
 </template>
 
@@ -25,6 +29,14 @@ export default {
     imgUrl() {
       return resolveImage(this.lesson.subject.toLowerCase());
     }
+  },
+  methods: {
+    handleClick(event) {
+      this.$emit('add', this.lesson);
+      const btn = event.target;
+      btn.classList.add('clicked');
+      setTimeout(() => btn.classList.remove('clicked'), 300);
+    }
   }
 };
 </script>
@@ -38,6 +50,18 @@ export default {
   flex-direction: column;
   gap: .5rem;
   background: #fff;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+
+.card:is(:hover, :focus-within) {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, .20);
+  border-color: #c7d2fe;
+}
+
+.card :is(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
 }
 
 .lesson-img {
@@ -63,6 +87,11 @@ button {
   background: #2563eb;
   color: #fff;
   cursor: pointer;
+}
+
+button.clicked {
+  background: #16a34a; /* green */
+  transition: background 0.4s;
 }
 
 button:disabled {
