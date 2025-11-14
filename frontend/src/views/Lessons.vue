@@ -58,6 +58,7 @@ export default {
   methods: {
     async load() {
       this.items = await getLessons(this.q ? { q: this.q } : {});
+      console.log('LESSONS FROM BACKEND:', this.items);
       this.view = [...this.items];
       this.applySort();
     },

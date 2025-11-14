@@ -28,7 +28,5 @@ desktop.ini
 *.sln
 *.sw?
 
-
-# Environment variables
-.env
-.env.*
+.env  
+!.env.production
