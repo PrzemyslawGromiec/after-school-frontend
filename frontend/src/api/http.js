@@ -1,8 +1,16 @@
 const BASE = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_URL;
 
-export function api(path, options = {}) {
-  return fetch(`${BASE}${path}`, {
+export async function api(path, options = {}) {
+  console.log('env', import.meta.env);
+  const res = await fetch(`${BASE}${path}`, {
     headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
     ...options
-  }).then(res => res.ok ? res.json() : res.text().then(t => { throw new Error(t || res.statusText) }));
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(text || res.statusText);
+  }
+
+  return res.json();
 }

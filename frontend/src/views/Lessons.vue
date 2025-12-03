@@ -79,9 +79,6 @@ export default {
 
     add(l) {
       useCart().add({ id: l._id, title: l.subject, price: l.price });
-      if (l.spaces > 0) {
-        l.spaces--;
-      }
     },
 
     applySort() {
