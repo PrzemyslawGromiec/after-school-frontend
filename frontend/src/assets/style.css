@@ -384,7 +384,7 @@ h3, p {
 }
 
 .cart-page .qty input[type="number"] {
-  -moz-appearance: textfield;
+   appearance: textfield;
 }
 
 /* hide spin buttons */
