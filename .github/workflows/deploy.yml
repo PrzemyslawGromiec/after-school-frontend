@@ -25,17 +25,15 @@ jobs:
         run: npm cache clean --force
 
       - name: Install deps
-        working-directory: frontend
         run: npm install --include=optional
 
       - name: Build
-        working-directory: frontend
         run: npm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend/dist
+          path: dist 
 
   deploy:
     needs: build
