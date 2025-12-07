@@ -58,18 +58,31 @@ export default {
     customer: { name: '', phone: '' },
     touched: false
   }),
+
+  watch: {
+    'customer.name'(val) {
+      this.customer.name = val.trim().replace(/\s+/g, ' ');
+    }
+  },
+
   computed: {
     cart() { return useCart(); },
     items() { return this.cart.items || []; },
     count() { return this.cart.count ?? this.items.reduce((a, i) => a + i.qty, 0); },
     total() { return this.cart.total ?? this.items.reduce((a, i) => a + i.qty * i.price, 0); },
+
+    isCorrectNameNoDigitsAndOtherCharacters() {
+       return /^[A-Za-z]+(?:[ '-][A-Za-z]+)*$/.test(this.customer.name);
+    },
+
     isValid() {
-      const nameOk = this.customer.name.length >= 2;
+      const nameOk = this.isCorrectNameNoDigitsAndOtherCharacters;
       // simple phone check: digits/space/+/- between 7–15 chars
       const phoneOk = /^\+?[0-9\s-]{7,15}$/.test(this.customer.phone);
       return nameOk && phoneOk && this.items.length > 0;
     }
   },
+
   methods: {
     inc(it) {
       if (typeof this.cart.add === 'function') {
@@ -78,23 +91,28 @@ export default {
         it.qty = (it.qty || 1) + 1;
       }
     },
+
     dec(it) {
       const idx = this.items.findIndex(x => x.id === it.id);
       if (idx === -1) return;
       if ((this.items[idx].qty || 1) > 1) this.items[idx].qty--;
       else this.items.splice(idx, 1);
     },
+
     remove(id) {
       const idx = this.items.findIndex(x => x.id === id);
       if (idx > -1) this.items.splice(idx, 1);
     },
+
     onQtyChange(it) {
       if (!it.qty || it.qty < 1) it.qty = 1;
     },
+
     clear() {
       if (typeof this.cart.clear === 'function') this.cart.clear();
       else this.cart.items = [];
     },
+
     async checkout() {
       this.touched = true;
       if (!this.isValid) return;
