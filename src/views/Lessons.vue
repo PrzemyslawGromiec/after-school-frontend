@@ -57,24 +57,70 @@ export default {
   },
   methods: {
     async load() {
-      this.items = await getLessons(this.q ? { q: this.q } : {});
+      this.items = await getLessons({});
       console.log('LESSONS FROM BACKEND:', this.items);
-      this.view = [...this.items];
-      this.applySort();
+      this.applyFiltersAndSort();
     },
 
     onSearchInput() {
       clearTimeout(this._qTimer);
-      this._qTimer = setTimeout(async () => {
+      this._qTimer = setTimeout(() => {
         this.q = this.qInput.trim();
-        this.load();
+        this.applyFiltersAndSort();
       }, 300);
     },
 
     clearSearch() {
       this.qInput = '';
       this.q = '';
-      this.load();
+      this.applyFiltersAndSort();
+    },
+
+    applyFiltersAndSort() {
+      let list = [...this.items];
+      const q = this.q.trim().toLowerCase();
+
+      if (q) {
+        const qNum = Number(q);
+        const isNumeric = !Number.isNaN(qNum);
+
+        list = list.filter(l => {
+          const subj = String(l.subject ?? "").toLowerCase();
+          const loc = String(l.location ?? "").toLowerCase();
+
+          if (!isNumeric) {
+            return subj.includes(q) || loc.includes(q);
+          }
+
+          const price = Number(l.price);
+          const spaces = Number(l.spaces);
+
+          if (this.sortKey === "price") {
+            return price === qNum;
+          }
+
+          if (this.sortKey === "spaces") {
+            return spaces === qNum;
+          }
+
+          return subj.includes(q) || loc.includes(q);
+        });
+      }
+
+      // sort AFTER filtering
+      const k = this.sortKey;
+      const d = this.dir === "ASC" ? 1 : -1;
+
+      list.sort((a, b) => {
+        const av = a[k];
+        const bv = b[k];
+
+        if (av > bv) return 1 * d;
+        if (av < bv) return -1 * d;
+        return 0;
+      });
+
+      this.view = list;
     },
 
     add(l) {
@@ -82,13 +128,12 @@ export default {
     },
 
     applySort() {
-      const k = this.sortKey, d = this.dir === 'ASC' ? 1 : -1;
-      this.view.sort((a, b) => (a[k] > b[k] ? 1 : a[k] < b[k] ? -1 : 0) * d);
+      this.applyFiltersAndSort();
     },
 
     toggleDir() {
       this.dir = this.dir === 'ASC' ? 'DESC' : 'ASC';
-      this.applySort();
+      this.applyFiltersAndSort();
     }
   }
 };
